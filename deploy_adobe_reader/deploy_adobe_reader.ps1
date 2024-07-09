@@ -28,7 +28,7 @@ function Log-Message {
         [string]$Status = "Info"
     )
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Host "[$ComputerName] [$timestamp] [$Status] $Message"
+    Write-Host "[$ComputerName] [$Status] $Message"
 }
 
 # Iterate through each remote computer and deploy the software
@@ -59,22 +59,15 @@ foreach ($ComputerName in $computers) {
             Start-Process -FilePath $batchFilePath -Wait
         } -ArgumentList $batchFilePath
         Log-Message -ComputerName $ComputerName -Message "Batch script executed successfully."
-
-        Log-Message -ComputerName $ComputerName -Message "Removing the installation folder..."
-        Invoke-Command -Session $Session -ScriptBlock {
-            param($destinationPath)
-            Remove-Item -Path $destinationPath -Recurse -Force
-        } -ArgumentList $destinationPath
-        Log-Message -ComputerName $ComputerName -Message "Installation folder removed successfully."
         
-        # Clean up user's temp folder on the remote server with elevated privileges
-        $currentUser = $env:USERNAME
-        $userTempFolder = "C:\Users\$currentUser\temp"
-        Invoke-Command -Session $Session -ScriptBlock {
-            param($userTempFolder)
-            Start-Process -FilePath PowerShell.exe -ArgumentList "Remove-Item '$using:userTempFolder' -Recurse -Force" -Verb RunAs
-            Write-Host "Attempted to remove $using:userTempFolder."
-        } -ArgumentList $userTempFolder
+        # Clean up user's temp folder on the remote server
+        Log-Message -ComputerName $ComputerName -Message "Removing the installation folder..."
+        Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+            Param($destinationFolder)
+            Remove-Item -Path $destinationFolder -Force -Recurse
+        } -ArgumentList $destinationFolder
+        Log-Message -ComputerName $ComputerName -Message "Installation folder removed successfully."
+
     } catch {
         Log-Message -ComputerName $ComputerName -Message $_.Exception.Message -Status "Error"
     } finally {
