@@ -53,7 +53,7 @@ foreach ($ComputerName in $computers) {
         Log-Message -ComputerName $ComputerName -Message "Software installation folder copied successfully."
         
         Log-Message -ComputerName $ComputerName -Message "Running batch script to install registry key and software..."
-        $batchFilePath = Join-Path -Path $destinationPath -ChildPath "install_with_regkey.bat"
+        $batchFilePath = Join-Path -Path $destinationPath -ChildPath (Split-Path -Leaf $installationFile)
         Invoke-Command -Session $Session -ScriptBlock {
             param($batchFilePath)
             Start-Process -FilePath $batchFilePath -Wait
