@@ -5,12 +5,7 @@
   / _, _// /|  / ___/ / / /    
  /_/ |_|/_/ |_/ /____/ /_/                                   
 
-    Script Name:    deploy_adobe_reader.ps1
-    Created By:     RNST
-    Created Date:   2024-07-09
-    Description:    This script deploys Adobe Reader remotely to servers provided from a txt file.
-    Version:        1.4
-    Notes:          Bug fix, now removes the temp folder aswell.
+    Github:    https://github.com/RnstM/powershell/tree/main/deploy_adobe_reader
 #>
 
 # Determine the script directory
@@ -72,9 +67,13 @@ foreach ($ComputerName in $computers) {
         } -ArgumentList $destinationPath
         Log-Message -ComputerName $ComputerName -Message "Installation folder removed successfully."
         
-        # Clean up C:\temp folder on the local machine
-        Remove-Item -Path $destinationFolder -Recurse -Force
-        Log-Message -ComputerName $ComputerName -Message "Removed C:\temp folder."
+        # Clean up C:\temp folder on the local machine if it exists
+        if (Test-Path $destinationFolder) {
+            Remove-Item -Path $destinationFolder -Recurse -Force
+            Log-Message -ComputerName $ComputerName -Message "Removed C:\temp folder."
+        } else {
+            Log-Message -ComputerName $ComputerName -Message "C:\temp folder does not exist."
+        }
     } catch {
         Log-Message -ComputerName $ComputerName -Message $_.Exception.Message -Status "Error"
     } finally {
@@ -83,3 +82,4 @@ foreach ($ComputerName in $computers) {
         Log-Message -ComputerName $ComputerName -Message "PowerShell session closed."
     }
 }
+
