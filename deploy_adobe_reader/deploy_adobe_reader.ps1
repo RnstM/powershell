@@ -13,11 +13,11 @@
     Notes:          Bug fix, now removes the temp folder aswell.
 #>
 
-# Determine the parent directory of the script directory
-$parentDir = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+# Determine the script directory
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# Load variables from external file in the parent directory of the script
-. "$parentDir\var\variables.ps1"
+# Load variables from external file in the same directory as the script
+. "$scriptDir\vars\variables.ps1"
 
 Write-Host " ____   _   __ _____ ______"
 Write-Host "/ __ \ / | / // ___//_  __/"
