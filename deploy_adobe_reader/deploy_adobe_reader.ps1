@@ -3,7 +3,7 @@
     / __ \ / | / // ___//_  __/
    / /_/ //  |/ / \__ \  / /   
   / _, _// /|  / ___/ / / /    
- /_/ |_|/_/ |_/ /____/ /_/                                   
+ /_/ |_|/_/ |_/ /____/ /_/                                  
 
     Github:    https://github.com/RnstM/powershell/tree/main/deploy_adobe_reader
 #>
@@ -67,13 +67,14 @@ foreach ($ComputerName in $computers) {
         } -ArgumentList $destinationPath
         Log-Message -ComputerName $ComputerName -Message "Installation folder removed successfully."
         
-        # Clean up C:\temp folder on the local machine if it exists
-        if (Test-Path $destinationFolder) {
-            Remove-Item -Path $destinationFolder -Recurse -Force
-            Log-Message -ComputerName $ComputerName -Message "Removed C:\temp folder."
-        } else {
-            Log-Message -ComputerName $ComputerName -Message "C:\temp folder does not exist."
-        }
+        # Clean up user's temp folder on the remote server with elevated privileges
+        $currentUser = $env:USERNAME
+        $userTempFolder = "C:\Users\$currentUser\temp"
+        Invoke-Command -Session $Session -ScriptBlock {
+            param($userTempFolder)
+            Start-Process -FilePath PowerShell.exe -ArgumentList "Remove-Item '$using:userTempFolder' -Recurse -Force" -Verb RunAs
+            Write-Host "Attempted to remove $using:userTempFolder."
+        } -ArgumentList $userTempFolder
     } catch {
         Log-Message -ComputerName $ComputerName -Message $_.Exception.Message -Status "Error"
     } finally {
@@ -82,4 +83,3 @@ foreach ($ComputerName in $computers) {
         Log-Message -ComputerName $ComputerName -Message "PowerShell session closed."
     }
 }
-
