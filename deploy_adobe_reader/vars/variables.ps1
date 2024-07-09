@@ -2,10 +2,10 @@
 $parentDir = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 
 # Pad naar de folder waar het installatie bestand staat
-$sourceFolder = "$parentDir\source\Adobe Reader"
+$sourceFolder = "$parentDir\source[APPLICATION_FOLDER]"
 
 # Pad naar het installatie bestand
-$installationFile = "$parentDir\source\Adobe Reader\install_with_regkey.bat"
+$installationFile = "$parentDir\source[APPLICATION_FOLDER\setup.exe]"
 
 # Locatie waar de installatie tijdelijk naar toe wordt gekopieerd op de server zodat het vanaf die locatie gestart kan worden,
 # deze locatie wordt verwijderd op het einde van het script.
